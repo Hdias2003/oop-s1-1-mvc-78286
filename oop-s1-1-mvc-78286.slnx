@@ -1,5 +1,4 @@
 <Solution>
-  <Project Path="Invoices.MVC/Invoices.MVC.csproj" />
   <Project Path="Librarie.Domain/Librarie.Domain.csproj" />
   <Project Path="Librarie.MVC/Librarie.MVC.csproj" />
   <Project Path="Librarie.test/Librarie.test.csproj" />
