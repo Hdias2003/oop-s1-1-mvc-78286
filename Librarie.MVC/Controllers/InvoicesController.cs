@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Librarie.Domain;
+using Librarie.Domain.Models;
+using Librarie.MVC.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Librarie.Domain;
-using Librarie.MVC.Data;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Librarie.MVC.Controllers
 {
@@ -22,143 +23,133 @@ namespace Librarie.MVC.Controllers
         // GET: Invoices
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Invoices.Include(i => i.Customer);
-            return View(await applicationDbContext.ToListAsync());
-        }
-
-        // GET: Invoices/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var invoice = await _context.Invoices
+            var invoices = await _context.Invoices
                 .Include(i => i.Customer)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (invoice == null)
-            {
-                return NotFound();
-            }
+                .Include(i => i.Lines)
+                    .ThenInclude(l => l.Product)
+                .OrderByDescending(i => i.InvoiceDate)
+                .ToListAsync();
 
-            return View(invoice);
+            return View(invoices);
         }
 
         // GET: Invoices/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "Name");
-            return View();
+            var vm = new CreateInvoiceViewModel
+            {
+                InvoiceDate = DateTime.Today,
+                Customers = await _context.Customers
+                    .OrderBy(c => c.Name)
+                    .Select(c => new SelectListItem
+                    {
+                        Value = c.Id.ToString(),
+                        Text = c.Name
+                    })
+                    .ToListAsync(),
+
+                Products = await _context.Products
+                    .OrderBy(p => p.Name)
+                    .Select(p => new SelectListItem
+                    {
+                        Value = p.Id.ToString(),
+                        Text = $"{p.Name} ({p.UnitPrice:C})"
+                    })
+                    .ToListAsync()
+            };
+
+            return View(vm);
         }
 
         // POST: Invoices/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,InvoiceDate,CustomerId")] Invoice invoice)
+        public async Task<IActionResult> Create(CreateInvoiceViewModel vm)
         {
-            if (ModelState.IsValid)
+            // Repopulate dropdowns if validation fails
+            async Task LoadListsAsync()
             {
-                _context.Add(invoice);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "Name", invoice.CustomerId);
-            return View(invoice);
-        }
-
-        // GET: Invoices/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var invoice = await _context.Invoices.FindAsync(id);
-            if (invoice == null)
-            {
-                return NotFound();
-            }
-            ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "Name", invoice.CustomerId);
-            return View(invoice);
-        }
-
-        // POST: Invoices/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,InvoiceDate,CustomerId")] Invoice invoice)
-        {
-            if (id != invoice.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(invoice);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!InvoiceExists(invoice.Id))
+                vm.Customers = await _context.Customers
+                    .OrderBy(c => c.Name)
+                    .Select(c => new SelectListItem
                     {
-                        return NotFound();
-                    }
-                    else
+                        Value = c.Id.ToString(),
+                        Text = c.Name
+                    })
+                    .ToListAsync();
+
+                vm.Products = await _context.Products
+                    .OrderBy(p => p.Name)
+                    .Select(p => new SelectListItem
                     {
-                        throw;
+                        Value = p.Id.ToString(),
+                        Text = $"{p.Name} ({p.UnitPrice:C})"
+                    })
+                    .ToListAsync();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                await LoadListsAsync();
+                return View(vm);
+            }
+
+            var customerExists = await _context.Customers
+                .AnyAsync(c => c.Id == vm.CustomerId);
+
+            if (!customerExists)
+            {
+                ModelState.AddModelError(nameof(vm.CustomerId), "Selected customer does not exist.");
+                await LoadListsAsync();
+                return View(vm);
+            }
+
+            var product = await _context.Products
+                .FirstOrDefaultAsync(p => p.Id == vm.ProductId);
+
+            if (product == null)
+            {
+                ModelState.AddModelError(nameof(vm.ProductId), "Selected product does not exist.");
+                await LoadListsAsync();
+                return View(vm);
+            }
+
+            var invoice = new Invoice
+            {
+                InvoiceDate = vm.InvoiceDate,
+                CustomerId = vm.CustomerId,
+                Lines = new List<InvoiceLine>
+                {
+                    new InvoiceLine
+                    {
+                        ProductId = vm.ProductId,
+                        Quantity = vm.Quantity,
+                        UnitPrice = product.UnitPrice // snapshot price
                     }
                 }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["CustomerId"] = new SelectList(_context.Customers, "Id", "Name", invoice.CustomerId);
-            return View(invoice);
+            };
+
+            _context.Invoices.Add(invoice);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Details), new { id = invoice.Id });
         }
 
-        // GET: Invoices/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        // GET: Invoices/Details/5
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var invoice = await _context.Invoices
                 .Include(i => i.Customer)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .Include(i => i.Lines)
+                    .ThenInclude(l => l.Product)
+                .FirstOrDefaultAsync(i => i.Id == id);
+
             if (invoice == null)
             {
                 return NotFound();
             }
 
             return View(invoice);
-        }
-
-        // POST: Invoices/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var invoice = await _context.Invoices.FindAsync(id);
-            if (invoice != null)
-            {
-                _context.Invoices.Remove(invoice);
-            }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool InvoiceExists(int id)
-        {
-            return _context.Invoices.Any(e => e.Id == id);
         }
     }
 }
