@@ -1,25 +1,20 @@
-using Librarie.MVC.Models;
-using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
+﻿using Microsoft.AspNetCore.Mvc;
 
-namespace Librarie.MVC.Controllers
+namespace Library.MVC.Controllers
 {
+    // The class name must end in "Controller"
     public class HomeController : Controller
     {
+        // This method handles the URL: /Home/Index or just /
         public IActionResult Index()
         {
             return View();
         }
 
-        public IActionResult Privacy()
+        // Optional: An "About" or "Contact" page
+        public IActionResult Contact()
         {
             return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

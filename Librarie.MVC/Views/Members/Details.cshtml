@@ -1,0 +1,33 @@
+﻿@model Library.Domain.Models.Member
+
+@{
+    ViewData["Title"] = "Member Profile";
+}
+
+<h1>Member Details</h1>
+
+<div class="card shadow-sm mt-4">
+    <div class="card-header bg-info text-white">
+        Member Information
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Full Name</dt>
+            <dd class="col-sm-9">@Model.FullName</dd>
+
+            <dt class="col-sm-3">Email Address</dt>
+            <dd class="col-sm-9">@Model.Email</dd>
+
+            <dt class="col-sm-3">Phone Number</dt>
+            <dd class="col-sm-9">@Model.Phone</dd>
+
+            <dt class="col-sm-3">Member Since</dt>
+            <dd class="col-sm-9">@Model.JoinDate.ToLongDateString()</dd>
+        </dl>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary">Edit Member</a>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+</div>

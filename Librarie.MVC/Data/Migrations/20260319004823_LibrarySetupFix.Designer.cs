@@ -4,6 +4,7 @@ using Librarie.MVC.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Librarie.MVC.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260319004823_LibrarySetupFix")]
+    partial class LibrarySetupFix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -70,9 +73,6 @@ namespace Librarie.MVC.Data.Migrations
                     b.Property<DateTime>("DueDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("IsReturned")
-                        .HasColumnType("bit");
-
                     b.Property<DateTime>("LoanDate")
                         .HasColumnType("datetime2");
 
@@ -106,9 +106,6 @@ namespace Librarie.MVC.Data.Migrations
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("JoinDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("Phone")
                         .IsRequired()

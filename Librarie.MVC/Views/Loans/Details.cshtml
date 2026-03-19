@@ -1,0 +1,37 @@
+﻿@model Library.Domain.Models.Loan
+
+@{
+    ViewData["Title"] = "Loan Details";
+}
+
+<h1>Loan Record</h1>
+
+<div>
+    <hr />
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">Book Borrowed</dt>
+                <dd class="col-sm-9">@Model.Book?.Title (@Model.Book?.Author)</dd>
+
+                <dt class="col-sm-3">Member</dt>
+                <dd class="col-sm-9">@Model.Member?.FullName</dd>
+
+                <dt class="col-sm-3">Date Issued</dt>
+                <dd class="col-sm-9">@Model.LoanDate.ToLongDateString()</dd>
+
+                <dt class="col-sm-3">Expected Return</dt>
+                <dd class="col-sm-9">@Model.DueDate.ToLongDateString()</dd>
+
+                <dt class="col-sm-3">Return Status</dt>
+                <dd class="col-sm-9">
+                    @(Model.IsReturned ? "Yes - Book is back in library" : "No - Still with member")
+                </dd>
+            </dl>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a asp-action="Index" class="btn btn-secondary">Back to Registry</a>
+</div>

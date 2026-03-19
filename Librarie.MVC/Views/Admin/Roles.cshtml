@@ -1,0 +1,69 @@
+﻿@using Microsoft.AspNetCore.Identity
+@model IEnumerable<IdentityRole>
+
+@{
+    ViewData["Title"] = "Admin - Role Management";
+}
+
+<div class="container mt-4">
+    <h1 class="display-6"><i class="bi bi-shield-lock"></i> Role Management</h1>
+    <hr />
+
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Create New Role</h5>
+        </div>
+        <div class="card-body">
+            <form asp-action="CreateRole" method="post" class="row g-3">
+                <div class="col-md-8">
+                    <input type="text" name="roleName" class="form-control" placeholder="e.g. Librarian, Assistant" required />
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-success w-100">Add Role</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <table class="table table-hover align-middle shadow-sm">
+        <thead class="table-dark">
+            <tr>
+                <th style="width: 40%">Role ID</th>
+                <th style="width: 40%">Role Name</th>
+                <th style="width: 20%" class="text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="3" class="text-center text-muted">No roles defined in the system.</td>
+                </tr>
+            }
+            @foreach (var role in Model)
+            {
+                <tr>
+                    <td class="text-muted small">@role.Id</td>
+                    <td>
+                        <span class="badge bg-info text-dark">@role.Name</span>
+                    </td>
+                    <td class="text-center">
+                        @if (role.Name != "Admin") // Safety: Prevent deleting the main Admin role
+                        {
+                            <form asp-action="DeleteRole" asp-route-id="@role.Id" method="post"
+                                  onsubmit="return confirm('Are you sure you want to delete the @role.Name role?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i> Delete
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <span class="text-muted small italic">System Protected</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

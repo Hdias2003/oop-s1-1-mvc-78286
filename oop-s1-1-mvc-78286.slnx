@@ -1,5 +1,5 @@
 <Solution>
-  <Project Path="Librarie.Domain/Librarie.Domain.csproj" />
-  <Project Path="Librarie.MVC/Librarie.MVC.csproj" />
-  <Project Path="Librarie.test/Librarie.test.csproj" />
+  <Project Path="Librarie.Domain/Library.Domain.csproj" />
+  <Project Path="Librarie.MVC/Library.MVC.csproj" />
+  <Project Path="Librarie.test/Library.test.csproj" />
 </Solution>

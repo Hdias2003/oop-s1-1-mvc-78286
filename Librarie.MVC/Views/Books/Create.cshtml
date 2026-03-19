@@ -1,0 +1,51 @@
+﻿@model Library.Domain.Models.Book
+
+@{
+    ViewData["Title"] = "Add New Book";
+}
+
+<h1>Add New Book</h1>
+
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="Title" class="form-label"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Author" class="form-label"></label>
+        <input asp-for="Author" class="form-control" />
+        <span asp-validation-for="Author" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Isbn" class="form-label"></label>
+        <input asp-for="Isbn" class="form-control" />
+        <span asp-validation-for="Isbn" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Category" class="form-label"></label>
+        <input asp-for="Category" class="form-control" />
+        <span asp-validation-for="Category" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3 form-check">
+        <input asp-for="IsAvailable" class="form-check-input" checked />
+        <label asp-for="IsAvailable" class="form-check-label">Available for Loan</label>
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary">Save Book</button>
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

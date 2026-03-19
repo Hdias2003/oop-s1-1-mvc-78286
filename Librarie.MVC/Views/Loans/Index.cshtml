@@ -1,0 +1,66 @@
+﻿@model IEnumerable<Library.Domain.Models.Loan>
+
+@{
+    ViewData["Title"] = "Active Loans";
+}
+
+<h1>Loan Management</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Issue New Loan</a>
+</p>
+
+<table class="table table-hover">
+    <thead class="table-light">
+        <tr>
+            <th>Book Title</th>
+            <th>Member Name</th>
+            <th>Loan Date</th>
+            <th>Due Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            // Simple logic to check if the book is late
+            bool isOverdue = !item.IsReturned && item.DueDate < DateTime.Now;
+
+            <tr class="@(isOverdue ? "table-danger" : "")">
+                <td>@item.Book?.Title</td>
+                <td>@item.Member?.FullName</td>
+                <td>@item.LoanDate.ToShortDateString()</td>
+                <td>@item.DueDate.ToShortDateString()</td>
+                <td>
+                    @if (item.IsReturned)
+                    {
+                        <span class="badge bg-secondary">Returned</span>
+                        <br />
+                        <small class="text-muted">On: @item.ReturnedDate?.ToShortDateString()</small>
+                    }
+                    else if (isOverdue)
+                    {
+                        <span class="badge bg-danger">OVERDUE</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success">Active</span>
+                    }
+                </td>
+                <td>
+                    <div class="btn-group">
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info text-white">View</a>
+                    
+                        @if (!item.IsReturned)
+                        {
+                            <form asp-action="ReturnBook" asp-route-id="@item.Id" method="post" onsubmit="return confirm('Mark this book as returned?');">
+                                <button type="submit" class="btn btn-sm btn-success ms-1">Return</button>
+                            </form>
+                        }
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,41 @@
+﻿@model IEnumerable<Library.Domain.Models.Member>
+
+@{
+    ViewData["Title"] = "Library Members";
+}
+
+<h1>Library Members</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Register New Member</a>
+</p>
+
+<table class="table table-hover mt-3">
+    <thead class="table-dark">
+        <tr>
+            <th>Full Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Join Date</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var member in Model)
+        {
+            <tr>
+                <td><strong>@member.FullName</strong></td>
+                <td>@member.Email</td>
+                <td>@member.Phone</td>
+                <td>@member.JoinDate.ToShortDateString()</td>
+                <td>
+                    <div class="btn-group">
+                        <a asp-action="Edit" asp-route-id="@member.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                        <a asp-action="Details" asp-route-id="@member.Id" class="btn btn-sm btn-outline-info">Details</a>
+                        <a asp-action="Delete" asp-route-id="@member.Id" class="btn btn-sm btn-outline-danger">Remove</a>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

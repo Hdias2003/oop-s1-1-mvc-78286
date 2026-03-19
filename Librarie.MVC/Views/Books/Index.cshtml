@@ -1,0 +1,82 @@
+﻿@model IEnumerable<Library.Domain.Models.Book>
+
+@{
+    ViewData["Title"] = "Book Catalog";
+}
+
+<h1>Book Catalog</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Add New Book</a>
+</p>
+<form asp-action="Index" method="get" class="row g-3 mb-4">
+    <div class="col-md-3">
+        <input type="text" name="searchString" value="@ViewBag.CurrentSearch" class="form-control" placeholder="Search Title or Author..." />
+    </div>
+
+    <div class="col-md-3">
+        <select name="categoryFilter" asp-items="ViewBag.Categories" class="form-select">
+            <option value="">-- All Categories --</option>
+        </select>
+    </div>
+
+    <div class="col-md-3">
+        <select name="availabilityFilter" class="form-select">
+            <option value="">-- All Status --</option>
+            <option value="Available" selected="@(ViewBag.CurrentAvailability == "Available")">Available</option>
+            <option value="OnLoan" selected="@(ViewBag.CurrentAvailability == "OnLoan")">On Loan</option>
+        </select>
+    </div>
+
+    <div class="col-md-3">
+        <button type="submit" class="btn btn-primary">Apply Filters</button>
+        <a asp-action="Index" class="btn btn-secondary">Reset</a>
+    </div>
+</form>
+
+
+<table class="table table-striped mt-3">
+    <thead class="table-dark">
+        <tr>
+            <th>
+                <a asp-action="Index" asp-route-sortOrder="@ViewBag.TitleSortParm">
+                    Title
+                </a>
+            </th>
+            <th>Author</th>
+            <th>ISBN</th>
+            <th>Category</th>
+            <th>Status</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var book in Model)
+        {
+            <tr>
+                <td>@book.Title</td>
+                <td>@book.Author</td>
+                <td>@book.Isbn</td>
+                <td>@book.Category</td>
+                <td>
+                    @if (book.IsAvailable)
+                    {
+                        <span class="badge bg-success">Available</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">On Loan</span>
+                    }
+                </td>
+                <td>
+                    <div class="btn-group" role="group">
+                        <a asp-action="Edit" asp-route-id="@book.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                        <a asp-action="Details" asp-route-id="@book.Id" class="btn btn-sm btn-outline-info">Details</a>
+                        <a asp-action="Delete" asp-route-id="@book.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                    </div>
+                </td>
+            </tr>
+        }
+
+    </tbody>
+</table>
