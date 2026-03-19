@@ -2,18 +2,24 @@
 
 namespace Library.MVC.Controllers
 {
-    // The class name must end in "Controller"
+    // In ASP.NET Core, the "Home" controller is usually the default starting point.
+    // The class name must end in "Controller" so the system can find it.
     public class HomeController : Controller
     {
-        // This method handles the URL: /Home/Index or just /
+        // GET: / (The Root) or /Home/Index
+        // Purpose: This is the "Landing Page" of your library website.
         public IActionResult Index()
         {
+            // return View() looks for a file named "Index.cshtml" 
+            // inside the /Views/Home/ folder and displays it to the user.
             return View();
         }
 
-        // Optional: An "About" or "Contact" page
+        // GET: /Home/Contact
+        // Purpose: Displays a simple page with contact information or a support form.
         public IActionResult Contact()
         {
+            // Looks for "Contact.cshtml" in the /Views/Home/ folder.
             return View();
         }
     }

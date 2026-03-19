@@ -4,19 +4,16 @@ using Librarie.MVC.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Librarie.MVC.Data.Migrations
+namespace Library.MVC.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260319001748_InitialLibrarySetup")]
-    partial class InitialLibrarySetup
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -25,7 +22,7 @@ namespace Librarie.MVC.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("CommunityLibrary.Models.Book", b =>
+            modelBuilder.Entity("Library.Domain.Models.Book", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -59,7 +56,7 @@ namespace Librarie.MVC.Data.Migrations
                     b.ToTable("Books");
                 });
 
-            modelBuilder.Entity("CommunityLibrary.Models.Loan", b =>
+            modelBuilder.Entity("Library.Domain.Models.Loan", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -72,6 +69,9 @@ namespace Librarie.MVC.Data.Migrations
 
                     b.Property<DateTime>("DueDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsReturned")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("LoanDate")
                         .HasColumnType("datetime2");
@@ -91,7 +91,7 @@ namespace Librarie.MVC.Data.Migrations
                     b.ToTable("Loans");
                 });
 
-            modelBuilder.Entity("CommunityLibrary.Models.Member", b =>
+            modelBuilder.Entity("Library.Domain.Models.Member", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -105,8 +105,10 @@ namespace Librarie.MVC.Data.Migrations
 
                     b.Property<string>("FullName")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("JoinDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Phone")
                         .IsRequired()
@@ -319,15 +321,15 @@ namespace Librarie.MVC.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("CommunityLibrary.Models.Loan", b =>
+            modelBuilder.Entity("Library.Domain.Models.Loan", b =>
                 {
-                    b.HasOne("CommunityLibrary.Models.Book", "Book")
+                    b.HasOne("Library.Domain.Models.Book", "Book")
                         .WithMany("Loans")
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("CommunityLibrary.Models.Member", "Member")
+                    b.HasOne("Library.Domain.Models.Member", "Member")
                         .WithMany("Loans")
                         .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -389,12 +391,12 @@ namespace Librarie.MVC.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("CommunityLibrary.Models.Book", b =>
+            modelBuilder.Entity("Library.Domain.Models.Book", b =>
                 {
                     b.Navigation("Loans");
                 });
 
-            modelBuilder.Entity("CommunityLibrary.Models.Member", b =>
+            modelBuilder.Entity("Library.Domain.Models.Member", b =>
                 {
                     b.Navigation("Loans");
                 });
